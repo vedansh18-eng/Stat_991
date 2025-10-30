@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main() {
+    int n;
+    printf("Enter number of elements: ");
+    if (scanf("%d", &n) != 1 || n <= 0) {
+        printf("Invalid number of elements. Exiting.\n");
+        return 1;
+    }
+
+    double *data = (double*) malloc(n * sizeof(double));
+    if (data == NULL) {
+        printf("Memory allocation failed.\n");
+        return 1;
+    }
+
+    printf("Enter %d data values (separated by spaces or newlines):\n", n);
+    for (int i = 0; i < n; ++i) {
+        if (scanf("%lf", &data[i]) != 1) {
+            printf("Invalid input. Exiting.\n");
+            free(data);
+            return 1;
+        }
+    }
+
+    // Calculate mean
+    double sum = 0.0;
+    for (int i = 0; i < n; ++i) sum += data[i];
+    double mean = sum / n;
+
+    // Find min and max for range
+    double min = data[0], max = data[0];
+    for (int i = 1; i < n; ++i) {
+        if (data[i] < min) min = data[i];
+        if (data[i] > max) max = data[i];
+    }
+    double range = max - min;
+
+    // Compute squared differences and their sum
+    double *diff = (double*) malloc(n * sizeof(double));
+    double *sqdiff = (double*) malloc(n * sizeof(double));
+    if (diff == NULL || sqdiff == NULL) {
+        printf("Memory allocation failed.\n");
+        free(data);
+        free(diff);
+        free(sqdiff);
+        return 1;
+    }
+
+    double sumSq = 0.0;
+    for (int i = 0; i < n; ++i) {
+        diff[i] = data[i] - mean;
+        sqdiff[i] = diff[i] * diff[i];
+        sumSq += sqdiff[i];
+    }
+
+    // Population variance and standard deviation
+    double popVariance = sumSq / n;
+    double popStdDev = sqrt(popVariance);
+
+    // Sample variance and standard deviation (only valid if n > 1)
+    double sampVariance = NAN, sampStdDev = NAN;
+    if (n > 1) {
+        sampVariance = sumSq / (n - 1);
+        sampStdDev = sqrt(sampVariance);
+    }
+
+    // Display results
+    printf("\n--- Intermediate steps and results ---\n\n");
+
+    printf("Data values:\n");
+    for (int i = 0; i < n; ++i) {
+        printf("  x[%d] = %.6f\n", i+1, data[i]);
+    }
+
+    printf("\nMean (\\u03BC) = sum / n = %.6f / %d = %.6f\n", sum, n, mean);
+    printf("Range = max - min = %.6f - %.6f = %.6f\n", max, min, range);
+
+    printf("\nValue  |  Difference (x - mean)  |  Squared difference (x - mean)^2\n");
+    printf("---------------------------------------------------------------\n");
+    for (int i = 0; i < n; ++i) {
+        printf("%6.6f  |  %15.6f  |  %24.6f\n", data[i], diff[i], sqdiff[i]);
+    }
+    printf("---------------------------------------------------------------\n");
+    printf("Sum of squared differences = %.6f\n", sumSq);
+
+    printf("\nPopulation variance (σ^2) = sumSq / n = %.6f / %d = %.6f\n", sumSq, n, popVariance);
+    printf("Population standard deviation (σ) = sqrt(σ^2) = %.6f\n", popStdDev);
+
+    if (n > 1) {
+        printf("\nSample variance (s^2) = sumSq / (n - 1) = %.6f / %d = %.6f\n", sumSq, n-1, sampVariance);
+        printf("Sample standard deviation (s) = sqrt(s^2) = %.6f\n", sampStdDev);
+    } else {
+        printf("\nSample variance and sample standard deviation are undefined for n = 1.\n");
+    }
+
+    // Free allocated memory
+    free(data);
+    free(diff);
+    free(sqdiff);
+
+    return 0;
+}
