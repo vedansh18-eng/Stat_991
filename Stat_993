@@ -1,0 +1,44 @@
+/* dice_simulation.c
+   Simulate rolling two dice TRIALS times, estimate P(sum == 7),
+   and compare to the theoretical probability 1/6.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+
+int roll_die(void) {
+    // rand() % 6 yields 0..5; add 1 => 1..6
+    return (rand() % 6) + 1;
+}
+
+int main(void) {
+    const int TRIALS = 10000;
+    const double theoretical = 1.0 / 6.0; // There are 6 favorable outcomes out of 36
+    int count_sum7 = 0;
+
+    // Seed RNG
+    srand((unsigned int) time(NULL));
+
+    for (int t = 0; t < TRIALS; ++t) {
+        int d1 = roll_die();
+        int d2 = roll_die();
+        int sum = d1 + d2;
+        if (sum == 7) ++count_sum7;
+    }
+
+    double estimated = (double) count_sum7 / TRIALS;
+    double abs_diff = fabs(estimated - theoretical);
+    double rel_error_percent = (abs_diff / theoretical) * 100.0;
+
+    printf("Simulation of rolling two dice %d times\n", TRIALS);
+    printf("----------------------------------------\n");
+    printf("Count of sums == 7     : %d\n", count_sum7);
+    printf("Estimated probability  : %.6f\n", estimated);
+    printf("Theoretical probability: %.6f  (6/36 = 1/6)\n", theoretical);
+    printf("Absolute difference    : %.6f\n", abs_diff);
+    printf("Relative error         : %.4f%%\n", rel_error_percent);
+
+    return 0;
+}
