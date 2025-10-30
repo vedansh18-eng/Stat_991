@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    // --- Step 1: Define Data ---
+    // Sample marks for two classes (assumed data)
+    double classA[] = {78, 82, 85, 90, 87, 76, 84, 89};
+    double classB[] = {70, 68, 74, 72, 65, 69, 73, 71};
+
+    int n1 = sizeof(classA) / sizeof(classA[0]);
+    int n2 = sizeof(classB) / sizeof(classB[0]);
+
+    // --- Step 2: Compute Means ---
+    double sum1 = 0, sum2 = 0;
+    for (int i = 0; i < n1; i++) sum1 += classA[i];
+    for (int i = 0; i < n2; i++) sum2 += classB[i];
+    double mean1 = sum1 / n1;
+    double mean2 = sum2 / n2;
+
+    // --- Step 3: Compute Variances ---
+    double var1 = 0, var2 = 0;
+    for (int i = 0; i < n1; i++) var1 += pow(classA[i] - mean1, 2);
+    for (int i = 0; i < n2; i++) var2 += pow(classB[i] - mean2, 2);
+    var1 /= (n1 - 1);
+    var2 /= (n2 - 1);
+
+    // --- Step 4: Calculate Pooled Standard Deviation ---
+    double sp = sqrt(((n1 - 1) * var1 + (n2 - 1) * var2) / (n1 + n2 - 2));
+
+    // --- Step 5: Compute t-statistic ---
+    double t = (mean1 - mean2) / (sp * sqrt(1.0 / n1 + 1.0 / n2));
+
+    // --- Step 6: Display Results ---
+    printf("Hypothesis Testing: Two-Sample t-Test\n");
+    printf("=====================================\n");
+    printf("Null Hypothesis (H0): Mean of Class A = Mean of Class B\n");
+    printf("Alternative Hypothesis (H1): Mean of Class A ≠ Mean of Class B\n\n");
+
+    printf("Class A Mean = %.2f, Variance = %.2f\n", mean1, var1);
+    printf("Class B Mean = %.2f, Variance = %.2f\n", mean2, var2);
+    printf("Pooled Standard Deviation (Sp) = %.4f\n", sp);
+    printf("t-statistic = %.4f\n", t);
+
+    // --- Step 7: Interpretation ---
+    // Assuming significance level α = 0.05 and degrees of freedom = n1 + n2 - 2
+    int df = n1 + n2 - 2;
+    double t_critical = 2.145; // approximate critical value for df ≈ 14, α = 0.05 (two-tailed)
+
+    printf("\nDegrees of Freedom = %d\n", df);
+    printf("Critical t-value (two-tailed, α=0.05) = ±%.3f\n", t_critical);
+
+    if (fabs(t) > t_critical)
+        printf("Result: |t| > %.3f → Reject H0 → The class averages are significantly different.\n", t_critical);
+    else
+        printf("Result: |t| ≤ %.3f → Fail to Reject H0 → No significant difference in class averages.\n", t_critical);
+
+    return 0;
+}
