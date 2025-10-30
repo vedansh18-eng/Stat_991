@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    // Sample data: study hours (x) vs exam scores (y)
+    double x[] = {2, 3, 4, 5, 6, 7, 8};
+    double y[] = {50, 55, 60, 65, 70, 75, 80};
+    int n = sizeof(x) / sizeof(x[0]);
+
+    double sum_x = 0, sum_y = 0, sum_xy = 0;
+    double sum_x2 = 0, sum_y2 = 0;
+
+    // Calculate sums
+    for (int i = 0; i < n; i++) {
+        sum_x += x[i];
+        sum_y += y[i];
+        sum_xy += x[i] * y[i];
+        sum_x2 += x[i] * x[i];
+        sum_y2 += y[i] * y[i];
+    }
+
+    // Calculate means
+    double mean_x = sum_x / n;
+    double mean_y = sum_y / n;
+
+    // Calculate correlation coefficient (r)
+    double numerator = n * sum_xy - sum_x * sum_y;
+    double denominator = sqrt((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y));
+    double r = numerator / denominator;
+
+    // Calculate regression coefficients
+    double b = numerator / (n * sum_x2 - sum_x * sum_x);  // slope
+    double a = mean_y - b * mean_x;                       // intercept
+
+    // Display results
+    printf("Correlation Coefficient (r) = %.4f\n", r);
+    printf("Regression Line: y = %.4f + %.4fx\n", a, b);
+
+    // Optional: predict exam score for a given number of study hours
+    double x_new = 9.0;
+    double y_pred = a + b * x_new;
+    printf("Predicted exam score for %.2f study hours = %.2f\n", x_new, y_pred);
+
+    return 0;
+}
